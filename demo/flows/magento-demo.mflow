@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="magento-demo">
+    <global-element type="http://www.mulesoft.org/schema/mule/magento/config" name="Magento" entity-id="44225580-d3a3-41cc-b85e-a31e899a0cd5">
+        <properties>
+            <property value="Magento" name="name"/>
+            <property value="api" name="username"/>
+            <property value="mulemanishere" name="password"/>
+            <property value="http://127.0.0.1/magento/index.php/api/v2_soap" name="address"/>
+        </properties>
+    </global-element>
+    <flow SubFlow="false" name="magento-demoFlow1">
+        <properties>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+        </properties>
+        <lane hadOnlyOneElement="false" entity-id="0de9538c-05da-456d-bb30-cde64ce127ed">
+            <endpoint message-exchange-pattern="OneWay" direction="Inbound" type="http://www.mulesoft.org/schema/mule/http/endpoint" name="HTTP" entity-id="279d0e9a-51c6-4edd-9ec4-4e69cfe7ae0b">
+                <properties>
+                    <property value="one-way" name="exchange-pattern"/>
+                    <property value="request-response" name="exchange-pattern"/>
+                    <property value="http://www.mulesoft.org/schema/mule/http/endpoint" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property name="httpLabel"/>
+                    <property value="localhost" name="host"/>
+                    <property value="8081" name="port"/>
+                    <property name="path"/>
+                    <property name="method"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="address"/>
+                    <property name="encoding"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="mimeType"/>
+                    <property name="responseTimeout"/>
+                    <property name="followRedirects"/>
+                    <property name="connector-ref"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="responseTransformer-refs"/>
+                    <property name="user"/>
+                    <property name="password"/>
+                    <property name="contentType"/>
+                    <property name="keep-alive"/>
+                </properties>
+            </endpoint>
+            <pattern type="http://www.mulesoft.org/schema/mule/magento/magento-connector" name="Create shopping cart" entity-id="bcb74aeb-4387-4b6e-bece-aa311cd666c2">
+                <properties>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="http://www.mulesoft.org/schema/mule/magento/create-shopping-cart" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Magento" name="config-ref"/>
+                    <property name="storeId"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/message-properties-transformer" name="Store cart id" entity-id="80cd4fc2-77af-48bb-b7bf-3cf74eaf263a">
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="overwrite"/>
+                    <property value="invocation" name="scope"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/core/add-message-property;0">
+                        <property value="#[payload]" name="value"/>
+                        <property value="cartId" name="key"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/magento/magento-connector" name="Create a product" entity-id="8811af2a-fef2-49e7-95b0-e0d879c0b4c2">
+                <properties>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="http://www.mulesoft.org/schema/mule/magento/create-product" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="simple" name="type"/>
+                    <property value="4" name="set"/>
+                    <property value="SKU123456789" name="sku"/>
+                    <property name="storeViewIdOrCode"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/magento/create-product-attributess;0">
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/magento/create-product-attributes;1">
+                            <property value="Blue light saber" name="value"/>
+                            <property value="name" name="key"/>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/core/message-properties-transformer" name="Store product id" entity-id="7fa315f7-b4ff-4799-b36a-d25c1401037a">
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="overwrite"/>
+                    <property value="invocation" name="scope"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/core/add-message-property;0">
+                        <property value="#[payload]" name="value"/>
+                        <property value="productId" name="key"/>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/magento/magento-connector" name="Add stock for product" entity-id="f9bb2dc0-107f-4b87-88b7-13c5ca6a44b5">
+                <properties>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="http://www.mulesoft.org/schema/mule/magento/update-stock-item" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="SKU123456789" name="productIdOrSku"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/magento/update-stock-item-attributess;0">
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/magento/update-stock-item-attributes;1">
+                            <property value="1" name="value"/>
+                            <property value="is_in_stock" name="key"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/magento/update-stock-item-attributes;2">
+                            <property value="5" name="value"/>
+                            <property value="qty" name="key"/>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/magento/magento-connector" name="Add 2 units of the product to the cart" entity-id="8c9b0857-0c13-485a-aff6-a9550d2771ff">
+                <properties>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="http://www.mulesoft.org/schema/mule/magento/add-shopping-cart-product" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="#[groovy:message.getInvocationProperty('cartId')]" name="quoteId"/>
+                    <property name="storeId"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/magento/add-shopping-cart-product-products-attributess;0">
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/magento/add-shopping-cart-product-products-attributes;1">
+                            <property-collection name="@http://www.mulesoft.org/schema/mule/magento/inner-add-shopping-cart-product-products-attributes;3">
+<property value="2" name="value"/>
+<property value="qty" name="key"/>
+                            </property-collection>
+                            <property-collection name="@http://www.mulesoft.org/schema/mule/magento/inner-add-shopping-cart-product-products-attributes;2">
+<property value="SKU123456789" name="value"/>
+<property value="sku" name="key"/>
+                            </property-collection>
+                            <property-collection name="@http://www.mulesoft.org/schema/mule/magento/inner-add-shopping-cart-product-products-attributes;1">
+<property value="#[groovy:message.getInvocationProperty('productId')]" name="value"/>
+<property value="product_id" name="key"/>
+                            </property-collection>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/magento/magento-connector" name="Magento" entity-id="bfe5763e-0369-45de-9c95-3a869c00578a">
+                <properties>
+                    <property value="Magento" name="config-ref"/>
+                    <property value="http://www.mulesoft.org/schema/mule/magento/delete-product" name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute"/>
+                    <property value="Magento" name="config-ref"/>
+                    <property name="productId"/>
+                    <property name="productIdOrSku"/>
+                    <property value="SKU123456789" name="productSku"/>
+                </properties>
+            </pattern>
+            <pattern type="http://www.mulesoft.org/schema/mule/json/object-to-json-transformer" name="Object to JSON" entity-id="e3f4f3a4-01e9-4d09-97b1-fc54f20138c0">
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="mapper-ref"/>
+                    <property name="sourceClass"/>
+                </properties>
+            </pattern>
+        </lane>
+    </flow>
+    <description></description>
+</mule-configuration>

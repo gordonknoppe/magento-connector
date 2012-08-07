@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:magento="http://www.mulesoft.org/schema/mule/magento" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="CE-3.3.0" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/magento http://www.mulesoft.org/schema/mule/magento/1.1/mule-magento.xsd 
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd 
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd ">
+    <magento:config name="Magento" username="api" password="mulemanishere" address="http://127.0.0.1/magento/index.php/api/v2_soap" doc:name="Magento"/>
+    <flow name="magento-demoFlow1" doc:name="magento-demoFlow1">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP"/>
+        <magento:create-shopping-cart config-ref="Magento" doc:name="Create shopping cart"/>
+        <message-properties-transformer doc:name="Store cart id" scope="invocation">
+            <add-message-property key="cartId" value="#[payload]"/>
+        </message-properties-transformer>
+        <magento:create-product config-ref="Magento" type="simple" set="4" sku="SKU123456789" doc:name="Create a product">
+            <magento:attributes>
+                <magento:attribute key="name">Blue light saber</magento:attribute>
+            </magento:attributes>
+        </magento:create-product>
+        <message-properties-transformer doc:name="Store product id" scope="invocation">
+            <add-message-property key="productId" value="#[payload]"/>
+        </message-properties-transformer>
+        <magento:update-stock-item config-ref="Magento" productIdOrSku="SKU123456789" doc:name="Add stock for product">
+            <magento:attributes>
+                <magento:attribute key="is_in_stock">1</magento:attribute>
+                <magento:attribute key="qty">5</magento:attribute>
+            </magento:attributes>
+        </magento:update-stock-item>
+        <magento:add-shopping-cart-product config-ref="Magento" quoteId="#[groovy:message.getInvocationProperty('cartId')]" doc:name="Add 2 units of the product to the cart">
+            <magento:products-attributes>
+                <magento:products-attribute>
+                    <magento:inner-products-attribute key="product_id">#[groovy:message.getInvocationProperty('productId')]</magento:inner-products-attribute>
+                    <magento:inner-products-attribute key="sku">SKU123456789</magento:inner-products-attribute>
+                    <magento:inner-products-attribute key="qty">2</magento:inner-products-attribute>
+                </magento:products-attribute>
+            </magento:products-attributes>
+        </magento:add-shopping-cart-product>
+        <magento:delete-product config-ref="Magento" productSku="SKU123456789" doc:name="Magento"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+    </flow>
+</mule>
